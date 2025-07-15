@@ -7,43 +7,66 @@ const authRoutes = require("./routes/authRoute.js");
 const categoryRoutes = require("./routes/categoryRoute.js");
 const productRoutes = require("./routes/productRoute.js");
 const cors = require("cors");
-const path = require("path")
+const path = require("path");
 
-// configure env
+// Load environment variables
+dotenv.config();
 
-// dotenv.config();
-
-// database config
+// Connect to database
 connectDB();
 
 const app = express();
 
-app.use(cors());
+// Allowed CORS origins
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://apni-dukaan-seven.vercel.app",
+];
 
+// CORS options
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+// Apply CORS
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Handle preflight requests
+
+// JSON parser middleware
 app.use(express.json());
 
+// Logging in development
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-// routes
+// API routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/product", productRoutes);
 
-// rest api
+// Root route
 app.get("/", (req, res) => {
   res.send({
     message: "Welcome to e-commerce app",
   });
 });
 
-// PORT
-const PORT = process.env.PORT;
+// Server port
+const PORT = process.env.PORT || 8080;
 
-// listen server
+// Start server
 app.listen(PORT, () => {
   console.log(
-    `Server running on ${process.env.NODE_ENV} mode on PORT: ${PORT}`.bgBlue,
+    `Server running in ${process.env.NODE_ENV} mode on PORT: ${PORT}`.bgBlue
   );
 });
