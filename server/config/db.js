@@ -5,10 +5,8 @@ const path = require("path")
 require("dotenv").config({path: path.join(__dirname, '..', '.env')})
 
 const connectDB = async () => {
-  const DB = process.env.DATABASE_URL.replace(
-    "<password>",
-    process.env.DATABASE_PASSWORD,
-  );
+  const DB = process.env.DATABASE_URL;
+
 
   try {
     const conn = await mongoose.connect(DB);
